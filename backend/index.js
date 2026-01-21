@@ -18,7 +18,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 const allowedOrigins = ["http://localhost:5173", "http://localhost:5174",
-    "https://job-portal-fcpabq1w5-shreyaparkers-projects.vercel.app"];
+    "https://job-portal-lyart-nine.vercel.app/"];
 
 const corsOptions = {
     origin: (origin, callback) => {

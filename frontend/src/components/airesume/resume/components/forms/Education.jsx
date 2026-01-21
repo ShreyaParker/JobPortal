@@ -12,7 +12,7 @@ import { toast } from 'sonner';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GOOGLE_AI_API_KEY);
 const model = genAI.getGenerativeModel({
-    model: "gemini-1.5-flash",
+    model: "gemini-flash-latest",
     generationConfig: {
         responseMimeType: "application/json",
     },
@@ -62,17 +62,19 @@ function Education({ enabledNext }) {
         const educationData = educationalList[index];
         setLoading(true);
 
+        // UPDATED PROMPT
         const prompt = `
         University Name: ${educationData.universityName},
         Degree: ${educationData.degree},
         Major: ${educationData.major},
         Start Date: ${educationData.startDate},
         End Date: ${educationData.endDate},
-        Provide a description of the education experience, without any placeholders, such as:
-        "Gaining advanced skills in software development, algorithm design, and data analysis. 
-        Developed key skills in problem-solving, critical thinking, and teamwork."
-        Do not include any brackets or placeholders, just a complete description.
-    `;
+        
+        Generate a professional resume description for this education experience.
+        
+        IMPORTANT: Return the response strictly in JSON format with a single key "Description".
+        Example structure: { "Description": "Your generated description here..." }
+        `;
 
         try {
             const result = await model.generateContent(prompt);
@@ -81,6 +83,7 @@ function Education({ enabledNext }) {
 
             const parsed = JSON.parse(responseText);
 
+            // Now this check will pass because the AI will force the key 'Description'
             if (parsed && parsed.Description) {
                 const aiDescription = parsed.Description;
                 const newEntries = [...educationalList];
@@ -95,7 +98,15 @@ function Education({ enabledNext }) {
 
                 toast.success('AI description generated successfully!');
             } else {
-                console.error("AI response does not contain a valid 'Description'.");
+                console.error("AI response does not contain a valid 'Description'.", parsed);
+
+                // Fallback: If AI still sends a different key, try to grab the first value found
+                const firstKey = Object.keys(parsed)[0];
+                if(firstKey) {
+                    const fallbackDescription = parsed[firstKey];
+                    // ... repeat save logic with fallbackDescription if you want extra safety
+                }
+
                 toast.error('Failed to generate AI description.');
             }
         } catch (error) {

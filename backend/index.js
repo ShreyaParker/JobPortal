@@ -48,11 +48,11 @@ app.get("/", (req, res) => {
 });
 
 // API routes
-app.use("/api/v1/user", userRoute);
-app.use("/api/v1/company", companyRoute);
-app.use("/api/v1/job", jobRoute);
-app.use("/api/v1/application", applicationRoute);
-app.use("/api/v1/resume", resumeRoute);
+app.use("/user", userRoute);
+app.use("/company", companyRoute);
+app.use("/job", jobRoute);
+app.use("/application", applicationRoute);
+app.use("/resume", resumeRoute);
 
 app.listen(PORT, () => {
     connectDB();
